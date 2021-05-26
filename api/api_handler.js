@@ -1,7 +1,7 @@
-import {Login, storeFormData} from "../control/Form.js";
+import {Login, storeFormData,getall} from "../control/Form.js";
 import express from "express";
 
-export default function installHandler(app){
+export default async function installHandler(app){
     app.use(express.json())
     
     
@@ -15,18 +15,18 @@ export default function installHandler(app){
         }
     })
 
-    app.post('/form-data-set',(req,res) =>{
+    app.post('/form-data-set',async(req,res) =>{
         res.send(storeFormData(req.body));
     })
 
-    /*app.put('/update',(req,res,next)=>{
-      try{  
-        const result =  await update(req.body)
-        res.send(result)
-    }catch(e){
-        next(e)
-    }
-    })
+   
+   app.get('/login',async(req,res)=>{
+    const result = await getall()   
+    res.send(result)
+   })
+   
+   
+    /*
 
     app.delete('/delete',(req,res)=>{
         res.send(delete(req.body))

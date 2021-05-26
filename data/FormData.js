@@ -1,4 +1,8 @@
-
+export class formset{
+  constructor(){
+    this.forms = [];
+  }
+}
 
 
 export class FormData {

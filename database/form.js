@@ -41,7 +41,15 @@ export class FormSetDb{
     
     
     
-    
+    async read_all(form_set){
+        const rows = await this.query("SELECT * FROM form_data")
+        for (const row of rows) 
+        { const form_data = new FormData(); 
+            form_data.copy(row); 
+            form_set.forms.push(form_data); } 
+        
+        
+    }
     
     
     
