@@ -18,4 +18,19 @@ export default function installHandler(app){
     app.post('/form-data-set',(req,res) =>{
         res.send(storeFormData(req.body));
     })
+
+    /*app.put('/update',(req,res,next)=>{
+      try{  
+        const result =  await update(req.body)
+        res.send(result)
+    }catch(e){
+        next(e)
+    }
+    })
+
+    app.delete('/delete',(req,res)=>{
+        res.send(delete(req.body))
+    })*/
+
+
 }

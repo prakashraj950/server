@@ -17,22 +17,35 @@ export class FormSetDb{
                         if(err) throw err;
                     }
                 )
-            
-            
-        
-        
-        
-        }
-    
-        
-    
-    
-    
-    
+            }
     
     }
 
+    
 
+    /*update(set,id){
+        let stmt = "UPDATE form_data SET ? WHERE ?";
+
+        this.query(stmt,set,id,
+            (err,res)=>{
+                if(err) throw err;
+            })
+    }
+
+    delete(id){
+        let stmt = "DELETE FROM form_data WHERE ?";
+        this.query(stmt,id,(err,res)=>{
+            if(err) throw err;
+        })
+    }*/
+    
+    
+    
+    
+    
+    
+    
+    
     async read_form_data(form_data){
         const stmt = "SELECT * FROM form_data WHERE  STRCMP(Email,?) = 0";
 
