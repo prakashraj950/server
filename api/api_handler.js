@@ -1,4 +1,4 @@
-import {Login, storeFormData,getall} from "../control/Form.js";
+import {Login, storeFormData,getall,update} from "../control/Form.js";
 import express from "express";
 
 export default async function installHandler(app){
@@ -25,7 +25,15 @@ export default async function installHandler(app){
     res.send(result)
    })
    
-   
+   app.put('/update/:id',async(req,res)=>{
+       try {
+           let result =await update(req.params.id,req.body)
+         res.send(result)
+           
+       } catch (error) {
+        console.log(error);   
+       }
+   })
     /*
 
     app.delete('/delete',(req,res)=>{

@@ -30,8 +30,19 @@ export async function getall(){
     console.log(form_set)
     return form_set.forms;
     
-    
+    }
 
+export async function update(id,data){
+    let stmt = "UPDATE form_data SET ? WHERE id= ?";
+    conn.query(stmt,[data,id],(err,r)=>{
+        console.log(r);
+        if (err) throw err;
+        else return r
+    }
+
+    )
+// let daata= await form_set_db.update(id,data)
+// return daata
 }
 
 
