@@ -16,8 +16,8 @@ const app = express();
 //});
 
 app.use(cors())
-//file upload
 
+//file upload
 var storage = multer.diskStorage({
     destination: (req,file,cb)=>{
         cb(null,'public')
