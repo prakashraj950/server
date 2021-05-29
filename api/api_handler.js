@@ -1,6 +1,8 @@
 import {Login, storeFormData,getall,update} from "../control/Form.js";
 import express from "express";
-
+import fileUpload from "express-fileupload";
+import path from "path";
+const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
     
@@ -34,11 +36,30 @@ export default async function installHandler(app){
         console.log(error);   
        }
    })
-    /*
 
-    app.delete('/delete',(req,res)=>{
-        res.send(delete(req.body))
-    })*/
+   app.use(fileUpload());
+
+   app.post('/upload', function(req, res) {
+     let sampleFile;
+     let uploadPath;
+    console.log(req.query.Email)
+     if (!req.files || Object.keys(req.files).length === 0) {
+         console.log("hello")
+       return res.status(400).send('No files were uploaded.');
+       
+     }
+   
+     sampleFile = req.files.photo;
+     
+     uploadPath = __dirname + '/uploads/' + sampleFile.name;
+     console.log(uploadPath)
+     sampleFile.mv(uploadPath, function(err) {
+       if (err)
+         return res.status(500).send(err);
+   
+       res.send('File uploaded!');
+     });
+   });
 
 
 
