@@ -44,6 +44,16 @@ export class FormSetDb{
         
     }
     
+    /* async selectID(Email){
+    
+        let stmt = "SELECT firstname FROM form_data WHERE Email= ?";
+        ti.query(stmt,[Email],(err,r)=>{ 
+            if (err) throw err;
+            else return r;
+            
+        })
+    } */
+    
     
     
     

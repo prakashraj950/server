@@ -1,4 +1,4 @@
-import {Login, storeFormData,getall,update} from "../control/Form.js";
+import {Login, storeFormData,getall,update, selectID} from "../control/Form.js";
 import express from "express";
 import fileUpload from "express-fileupload";
 import path from "path";
@@ -37,11 +37,13 @@ export default async function installHandler(app){
        }
    })
 
-   app.use(fileUpload());
+   app.use(fileUpload({createParentPath:true}));
 
-   app.post('/upload', function(req, res) {
-     let sampleFile;
+   app.post('/upload', async function(req, res) {
+     
      let uploadPath;
+     const result = await selectID(req.query.Email)
+     console.log(result)
     console.log(req.query.Email)
      if (!req.files || Object.keys(req.files).length === 0) {
          console.log("hello")
@@ -49,16 +51,19 @@ export default async function installHandler(app){
        
      }
    
-     sampleFile = req.files.photo;
-     
-     uploadPath = __dirname + '/uploads/' + sampleFile.name;
+     const files = ["photo", "plus2_certificate", "ug_or_pg_certificate"];
+
+     for(const file of files) {
+      const sampleFile = req.files[file];
+      const file_name = sampleFile.name.split(".");
+      const file_ext = file_name[file_name.length-1];
+     uploadPath = __dirname + `/uploads/${result}/`+ file+"."+file_ext;
      console.log(uploadPath)
-     sampleFile.mv(uploadPath, function(err) {
-       if (err)
-         return res.status(500).send(err);
-   
-       res.send('File uploaded!');
-     });
+     sampleFile.mv(uploadPath);
+}
+     
+
+   res.send("file upload")
    });
 
 
