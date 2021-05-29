@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+//import multer from "multer";
 import installHandler from "./api/api_handler.js";
 dotenv.config();
 
@@ -15,7 +16,27 @@ const app = express();
 //});
 
 app.use(cors())
+//file upload
 
+var storage = multer.diskStorage({
+    destination: (req,file,cb)=>{
+        cb(null,'public')
+    },
+    filename:(req,file,cb)=>{
+        cb(null,Date.now()+'_'+file.originalname)
+    }
+})
+var upload = multer({storage:storage}).array('file');
+app.post('/upload',(req,res)=>{
+    upload(req,res,(err)=>{
+        if(err instanceof multer.MulterError){
+            return res.status(500).json(err)
+        } else if(err){
+            return res.status(500).json(err)
+        }
+     return res.status(200).send(req.file)
+    })
+})
 installHandler(app)
 
 

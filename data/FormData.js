@@ -1,8 +1,14 @@
-
+export class formset{
+  constructor(){
+    this.forms = [];
+  }
+}
 
 
 export class FormData {
     constructor() {
+      this.id = "";
+      this.role="";
       this.firstname = "";
       this.lastname = "";
       this.Email = "";
@@ -20,6 +26,8 @@ export class FormData {
     }
     
     copy(form){
+      this.id = form.id;
+      this.role = form.role;
       this.firstname = form.firstname;
       this.lastname = form.lastname;
       this.Email = form.Email;
