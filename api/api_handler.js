@@ -6,7 +6,7 @@ const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
     
-    
+    app.use(express.static('./uploads')) 
     app.post('/login',async(req,res,next)=>{
         try{
             const result = await Login(req.body.Email,req.body.Password)
@@ -51,16 +51,28 @@ export default async function installHandler(app){
        
      }
    
-     const files = ["photo", "plus2_certificate", "ug_or_pg_certificate"];
+     const files = ["Photo", "plusTwo_Certificate", "UG_or_PG_Certificate"];
 
      for(const file of files) {
       const sampleFile = req.files[file];
       const file_name = sampleFile.name.split(".");
       const file_ext = file_name[file_name.length-1];
      uploadPath = __dirname + `/uploads/${result}/`+ file+"."+file_ext;
-     console.log(uploadPath)
      sampleFile.mv(uploadPath);
-}
+     
+     var str = file+'.'+file_ext;
+     const filedata = {};
+    filedata[file]= str;
+    console.log(filedata)
+    try {
+        let upd =await update(result,filedata)
+      res.send(upd)
+        
+    } catch (error) {
+     console.log(error);   
+    }
+     
+ }
      
 
    res.send("file upload")
