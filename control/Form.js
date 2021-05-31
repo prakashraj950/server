@@ -38,12 +38,20 @@ export async function update(id,data){
         console.log(r);
         if (err) throw err;
         else return r
-    }
-
-    )
-// let daata= await form_set_db.update(id,data)
-// return daata
+    })
 }
+
+export async function selectID(Email){
+    let stmt = "SELECT id FROM form_data WHERE Email= ?";
+    return new Promise ( (resolve, reject) => {
+      conn.query(stmt,[Email],(err,r)=>{ 
+          if (err) reject(err);
+          else resolve(r[0].id);
+        });
+    })
+  
+}
+
 
 
 
