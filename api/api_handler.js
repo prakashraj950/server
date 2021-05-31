@@ -6,7 +6,7 @@ const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
     
-    app.use(express.static('./uploads')) 
+    app.use(express.static('./uploads'));
     app.post('/login',async(req,res,next)=>{
         try{
             const result = await Login(req.body.Email,req.body.Password)
@@ -65,8 +65,8 @@ export default async function installHandler(app){
     filedata[file]= str;
     console.log(filedata)
     try {
-        let upd =await update(result,filedata)
-      res.send(upd)
+        await update(result,filedata)
+      
         
     } catch (error) {
      console.log(error);   
