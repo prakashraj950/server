@@ -70,11 +70,14 @@ export async function userUpdate(id,data){
 }
 
 export async function selectID(Email){
+  console.log("hello")
     let stmt = "SELECT id FROM form_data WHERE Email= ?";
     return new Promise ( (resolve, reject) => {
       conn.query(stmt,[Email],(err,r)=>{ 
           if (err) reject(err);
-          else resolve(r[0].id);
+          else if (r.length === 1) resolve(r[0].id);
+          else reject("data does not exist");
+        
         });
     })
   
