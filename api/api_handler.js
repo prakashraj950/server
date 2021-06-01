@@ -1,7 +1,8 @@
-import {Login, storeFormData,getall,update, selectID} from "../control/Form.js";
-import express from "express";
+import {Login, storeFormData,getall,update, selectID,fetchData,userUpdate} from "../control/Form.js";
+import express, { response } from "express";
 import fileUpload from "express-fileupload";
 import path from "path";
+import { request } from "https";
 const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
@@ -16,26 +17,47 @@ export default async function installHandler(app){
             next(e)
         }
     })
+    app.post('/data', async(req, res)=>{
+        const result = await fetchData(req.body.Email, req.body.Password);
+        res.send(result);
+      });
+
+    app.post('/list',async(req,res)=>{
+        const result = await getall(req.body.Email, req.body.Password)  
+        res.send(result)
+       })
+
 
     app.post('/form-data-set',async(req,res) =>{
-        res.send(storeFormData(req.body));
+        if (req.body.captcha === undefined ||
+            req.body.captcha === '' ||
+            req.body.captcha === null){
+                return res.json({"success":false, 'msg':'please select captcha'})
+            } const secretKey = '6LcJmgQbAAAAAERIyZyuaZQCfd7HDOJ-tVyszujQ';
+            const verifyUrl = `https://google.com/recatcha/api/siteverify?secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.connection.remoteAddress}`;
+
+            request(verifyUrl,(err,res, body)=>{
+                body = JSON.parse(req.body);
+                if (body.success !== undefined && !body.success){
+                    return res.json({"success":false, 'msg':'Faild captcha verification'})
+                }
+                return res.send(storeFormData(req.body.data))
+            })
+        
     })
 
    
-   app.get('/login',async(req,res)=>{
-    const result = await getall()   
-    res.send(result)
-   })
+
    
-   app.put('/update/:id',async(req,res)=>{
-       try {
-           let result =await update(req.params.id,req.body)
-         res.send(result)
-           
-       } catch (error) {
-        console.log(error);   
-       }
-   })
+    app.put('/update',async(req,res)=>{
+        try {
+            let result =await update(req.body.form, req.body.pass)
+          res.send(result)
+            
+        } catch (error) {
+         console.log(error);
+        }
+    })
 
    app.use(fileUpload({createParentPath:true}));
 
@@ -65,7 +87,7 @@ export default async function installHandler(app){
     filedata[file]= str;
     console.log(filedata)
     try {
-        await update(result,filedata)
+        await userUpdate(result,filedata)
       
         
     } catch (error) {
