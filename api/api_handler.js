@@ -38,7 +38,7 @@ export default async function installHandler(app){
 
             request(verifyUrl,(err,res, body)=>{
                 body = JSON.parse(req.body);
-                if (body.success !== undefined && !body.success){
+                if (typeof body.success !== undefined && !body.success){
                     return res.json({"success":false, 'msg':'Faild captcha verification'})
                 }
                 return res.send(storeFormData(req.body.data))
