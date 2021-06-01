@@ -3,8 +3,7 @@ import express, { response } from "express";
 import fileUpload from "express-fileupload";
 import path from "path";
 import querystring from 'query-string';
-//import { request } from "https";
-import https from 'https'
+import https from 'https';
 const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
@@ -29,15 +28,15 @@ export default async function installHandler(app){
         res.send(result)
        })
 
-
-    app.post('/form-data-set',async(req,res) =>{
-        console.log()
+       app.post('/form-data-set',async(req,res) =>{
+        console.log(req.body)
         if (req.body.captcha === undefined ||
             req.body.captcha === '' ||
             req.body.captcha === null){
                 return res.json({"success":false, 'msg':'please select captcha'})
             } const secretKey = '6LcJmgQbAAAAAERIyZyuaZQCfd7HDOJ-tVyszujQ';
            // const verifyUrl = `https://google.com/recatcha/api/siteverify?secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.connection.remoteAddress}`;
+
 
             const postData = querystring.stringify({
                 secret: secretKey,
@@ -52,10 +51,10 @@ export default async function installHandler(app){
                   'Content-Type': 'application/x-www-form-urlencoded',
                   'Content-Length': Buffer.byteLength(postData)
                 }
-              };
+              }
               
 
-const request = https.request(options, (response) => {
+   const request = https.request(options, (response) => {
 	let data = '';
 	response.on('data', (chunk) => {
 		data = data + chunk.toString();
@@ -69,17 +68,18 @@ const request = https.request(options, (response) => {
             return res.json({"success":false, 'msg':'Faild captcha verification'})
         }
         storeFormData(req.body.data);
-        return ({"success":true, 'msg':'Captcha verification succeeded'})
+        return res.json({"success":true, 'msg':'Captcha verification succeeded'})
 	});
-})
+   })
 
-request.on('error', (error) => {
+   request.on('error', (error) => {
 	console.log('An error', error);
-});
-request.write(postData)
-request.end()
+   });
+   request.write(postData)
+    request.end()
         
     })
+
 
    
 
@@ -130,10 +130,12 @@ request.end()
     }
      
   }
-     
+     console.log("hello")
 
-   res.send("file upload")
-     } catch (err) {res.send(`file not uploaded.${err}`)} 
+   res.send("file uploaded")
+     } catch (err) {
+      console.log("hellocath") 
+      res.send(`file not uploaded.${err}`)} 
     
    });
  

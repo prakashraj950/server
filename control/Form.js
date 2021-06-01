@@ -6,6 +6,7 @@ const conn = connectDatabase();
 const form_set_db = new FormSetDb(conn);
 
 export function storeFormData(data){
+    console.log(data)
     const form_data = new FormData();
     form_data.copy(data);
     form_set_db.insert(form_data);
