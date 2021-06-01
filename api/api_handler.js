@@ -2,7 +2,9 @@ import {Login, storeFormData,getall,update, selectID,fetchData,userUpdate} from 
 import express, { response } from "express";
 import fileUpload from "express-fileupload";
 import path from "path";
-import { request } from "https";
+import querystring from 'query-string';
+//import { request } from "https";
+import https from 'https'
 const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
@@ -29,20 +31,53 @@ export default async function installHandler(app){
 
 
     app.post('/form-data-set',async(req,res) =>{
+        console.log()
         if (req.body.captcha === undefined ||
             req.body.captcha === '' ||
             req.body.captcha === null){
                 return res.json({"success":false, 'msg':'please select captcha'})
             } const secretKey = '6LcJmgQbAAAAAERIyZyuaZQCfd7HDOJ-tVyszujQ';
-            const verifyUrl = `https://google.com/recatcha/api/siteverify?secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.connection.remoteAddress}`;
+           // const verifyUrl = `https://google.com/recatcha/api/siteverify?secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.connection.remoteAddress}`;
 
-            request(verifyUrl,(err,res, body)=>{
-                body = JSON.parse(req.body);
-                if (typeof body.success !== undefined && !body.success){
-                    return res.json({"success":false, 'msg':'Faild captcha verification'})
-                }
-                return res.send(storeFormData(req.body.data))
-            })
+
+            const postData = querystring.stringify({
+                secret: secretKey,
+                response: req.body.captcha
+              });
+              
+              const options = {
+                hostname: 'www.google.com',
+                path: `/recaptcha/api/siteverify`,
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Content-Length': Buffer.byteLength(postData);
+            
+              
+
+const request = https.request(options, (response) => {
+	let data = '';
+	response.on('data', (chunk) => {
+		data = data + chunk.toString();
+	});
+
+	response.on('end', () => {
+        console.log(data)
+		const body = JSON.parse(data);
+		console.log(body);
+        if (typeof body.success !== "undefined" && !body.success){
+            return res.json({"success":false, 'msg':'Faild captcha verification'})
+        }
+        storeFormData(req.body.data);
+        return ({"success":true, 'msg':'Captcha verification succeeded'})
+	});
+})
+
+request.on('error', (error) => {
+	console.log('An error', error);
+});
+request.write(postData)
+request.end()
         
     })
 
@@ -61,8 +96,8 @@ export default async function installHandler(app){
 
    app.use(fileUpload({createParentPath:true}));
 
-   app.post('/upload', async function(req, res) {
-     
+   app.post('/upload', async function(req, res){ 
+    try{ 
      let uploadPath;
      const result = await selectID(req.query.Email)
      console.log(result)
@@ -94,13 +129,16 @@ export default async function installHandler(app){
      console.log(error);   
     }
      
- }
+  }
      
 
    res.send("file upload")
+     } catch (err) {res.send(`file not uploaded.${err}`)} 
+    
    });
-
-
-
-
+ 
+    
 }
+
+
+
