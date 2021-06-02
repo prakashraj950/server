@@ -3,7 +3,7 @@ import express, { response } from "express";
 import fileUpload from "express-fileupload";
 import path from "path";
 import querystring from 'query-string';
-import https from 'https';
+import axios from 'axios';
 const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
@@ -28,60 +28,38 @@ export default async function installHandler(app){
         res.send(result)
        })
 
-       app.post('/form-data-set',async(req,res) =>{
+    app.post('/form-data-set',async(req,res) =>{
         console.log(req.body)
-        if (req.body.captcha === undefined ||
+      if (req.body.captcha === undefined ||
             req.body.captcha === '' ||
             req.body.captcha === null){
                 return res.json({"success":false, 'msg':'please select captcha'})
             } const secretKey = '6LcJmgQbAAAAAERIyZyuaZQCfd7HDOJ-tVyszujQ';
-           // const verifyUrl = `https://google.com/recatcha/api/siteverify?secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.connection.remoteAddress}`;
+          
 
 
             const postData = querystring.stringify({
                 secret: secretKey,
                 response: req.body.captcha
               });
+            
+              const body = await axios.post('https://www.google.com/recaptcha/api/siteverify', postData);
               
-              const options = {
-                hostname: 'www.google.com',
-                path: `/recaptcha/api/siteverify`,
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  'Content-Length': Buffer.byteLength(postData)
-                }
-              }
+              if (typeof body.success !== "undefined" && !body.success){
+                return res.json({"success":false, 'msg':'Faild captcha verification'})
+            }
+            try{
+           await storeFormData(req.body.data);
+            return res.json({"success":true, 'msg':'Captcha verification succeeded'}) }
+            catch(err){
+              return res.status(400).send(err)
+            }
+          })
               
-
-   const request = https.request(options, (response) => {
-	let data = '';
-	response.on('data', (chunk) => {
-		data = data + chunk.toString();
-	});
-
-	response.on('end', () => {
-        console.log(data)
-		const body = JSON.parse(data);
-		console.log(body);
-        if (typeof body.success !== "undefined" && !body.success){
-            return res.json({"success":false, 'msg':'Faild captcha verification'})
-        }
-        storeFormData(req.body.data);
-        return res.json({"success":true, 'msg':'Captcha verification succeeded'})
-	});
-   })
-
-   request.on('error', (error) => {
-	console.log('An error', error);
-   });
-   request.write(postData)
-    request.end()
-        
-    })
-
 
    
+
+  
 
    
     app.put('/update',async(req,res)=>{
@@ -134,7 +112,6 @@ export default async function installHandler(app){
 
    res.send("file uploaded")
      } catch (err) {
-      console.log("hellocath") 
       res.send(`file not uploaded.${err}`)} 
     
    });

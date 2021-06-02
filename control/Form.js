@@ -5,11 +5,17 @@ import {formset,FormData} from "../data/FormData.js";
 const conn = connectDatabase();
 const form_set_db = new FormSetDb(conn);
 
-export function storeFormData(data){
+export async function storeFormData(data){
     console.log(data)
-    const form_data = new FormData();
+    try {await selectID(data.Email)
+      throw {name: "UserAlreadyExists", message: "user already exists"};
+    } 
+    catch (err) {if (err.name === "UserDoesNotExist") {
+      const form_data = new FormData();
     form_data.copy(data);
     form_set_db.insert(form_data);
+    } else throw err;}
+    
     
     
 }
@@ -71,13 +77,13 @@ export async function userUpdate(id,data){
 }
 
 export async function selectID(Email){
-  console.log("hello")
+  console.log("selectID")
     let stmt = "SELECT id FROM form_data WHERE Email= ?";
     return new Promise ( (resolve, reject) => {
       conn.query(stmt,[Email],(err,r)=>{ 
           if (err) reject(err);
           else if (r.length === 1) resolve(r[0].id);
-          else reject("data does not exist");
+          else reject({name: "UserDoesNotExist", message: "user does not exist"});
         
         });
     })
