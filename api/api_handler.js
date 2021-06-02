@@ -4,11 +4,27 @@ import fileUpload from "express-fileupload";
 import path from "path";
 import querystring from 'query-string';
 import axios from 'axios';
+import csv from 'csv-parser';
+import fs from 'fs';
 const __dirname = path.resolve();
 export default async function installHandler(app){
     app.use(express.json())
     
     app.use(express.static('./uploads'));
+    
+    app.post('/registerbycsv',(req,res,next)=>{
+      fs.createReadStream(req.files.csv.tempFilePath)
+  .pipe(csv())
+  .on('data', (data) => {
+    try {
+      storeFormData(data);
+    }
+    catch (err) {
+      console.log(err);
+    }
+ }).on('end', () => { res.send("completed") });
+    })
+
     app.post('/login',async(req,res,next)=>{
         try{
             const result = await Login(req.body.Email,req.body.Password)
@@ -44,7 +60,7 @@ export default async function installHandler(app){
               });
             
               const body = await axios.post('https://www.google.com/recaptcha/api/siteverify', postData);
-              
+
               if (typeof body.success !== "undefined" && !body.success){
                 return res.json({"success":false, 'msg':'Faild captcha verification'})
             }
@@ -72,7 +88,7 @@ export default async function installHandler(app){
         }
     })
 
-   app.use(fileUpload({createParentPath:true}));
+   app.use(fileUpload({createParentPath:true,useTempFiles:true}));
 
    app.post('/upload', async function(req, res){ 
     try{ 
