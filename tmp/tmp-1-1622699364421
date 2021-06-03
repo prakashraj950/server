@@ -1,0 +1,4 @@
+firstname,lastname,Email,Gender,age,Password,Contact,Country,District,languages,Department
+kannan,kumar,kannan@kum.com,male,20,selVA1,987654321,india,tirunelveli,python,IT
+kanna,kanna,kali@l.com,male,22,kaliLI1,9876543210,india,nellai,python,IT
+kamal,kamal,kamal@k.com,male,22,kamal@k.com,9876543210,nellai,python,IT

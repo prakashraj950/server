@@ -8,22 +8,22 @@ import csv from 'csv-parser';
 import fs from 'fs';
 const __dirname = path.resolve();
 export default async function installHandler(app){
-    app.use(express.json())
-    
+    app.use(express.json());
+    app.use(fileUpload({createParentPath:true,useTempFiles:true}));
     app.use(express.static('./uploads'));
     
-    app.post('/registerbycsv',(req,res,next)=>{
-      fs.createReadStream(req.files.csv.tempFilePath)
-  .pipe(csv())
-  .on('data', (data) => {
-    try {
-      storeFormData(data);
-    }
-    catch (err) {
-      console.log(err);
-    }
- }).on('end', () => { res.send("completed") });
-    })
+     app.post('/registerbycsv',(req,res)=>{
+        fs.createReadStream(req.files.csv.tempFilePath)
+        .pipe(csv())
+        .on('data', (data) => {
+          console.log(data)
+          storeFormData(data)
+          .catch( (err) => {
+            console.log(err);
+          });
+        }).on('end', () => { res.send("completed") });
+      });
+
 
     app.post('/login',async(req,res,next)=>{
         try{
@@ -88,7 +88,7 @@ export default async function installHandler(app){
         }
     })
 
-   app.use(fileUpload({createParentPath:true,useTempFiles:true}));
+   
 
    app.post('/upload', async function(req, res){ 
     try{ 
