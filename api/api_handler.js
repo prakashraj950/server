@@ -1,4 +1,4 @@
-import {Login, storeFormData,getall,update, selectID,fetchData,userUpdate} from "../control/Form.js";
+import {Login, storeFormData,getall,update, selectID,fetchData,userUpdate, mail} from "../control/Form.js";
 import express, { response } from "express";
 import fileUpload from "express-fileupload";
 import path from "path";
@@ -12,6 +12,12 @@ export default async function installHandler(app){
     app.use(fileUpload({createParentPath:true,useTempFiles:true}));
     app.use(express.static('./uploads'));
     
+    app.post('/send',(req,res)=>{
+      mail(req.body.to,req.body.subject,req.body.message)
+      .then(()=>{
+        res.send("mail sent successfuly")}).catch((err) => res.status(400).send(err));
+      })
+
      app.post('/registerbycsv',(req,res)=>{
         fs.createReadStream(req.files.csv.tempFilePath)
         .pipe(csv())

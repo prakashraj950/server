@@ -1,7 +1,7 @@
 import connectDatabase from "../database/db_connection.js";
 import {FormSetDb} from "../database/form.js";
 import {formset,FormData} from "../data/FormData.js";
-
+import nodemailer from 'nodemailer'
 const conn = connectDatabase();
 const form_set_db = new FormSetDb(conn);
 
@@ -48,8 +48,7 @@ export async function Login(Email,Password){
     const login_data = await Login(Email, Password);
     if(login_data.status === "success" && login_data.role === "admin"){
       const form_set = new formset();
-      await form_set_db.read_all(form_set)
-      console.log(form_set)
+      await form_set_db.read_all(form_set);
       return form_set.forms;
     }
     return [];
@@ -89,6 +88,42 @@ export async function selectID(Email){
     })
   
 }
+
+export async function mail(to,subject,text){
+  
+    
+    let testAccount = await nodemailer.createTestAccount();
+  
+    
+    let transporter = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false, 
+      auth: {
+        user: testAccount.user, 
+        pass: testAccount.pass, 
+      },
+    });
+  
+    
+    let info = await transporter.sendMail({
+      from: '"Fred Foo 👻" <foo@example.com>', 
+      to: to, 
+      subject: text,
+      text: text, 
+    });
+  
+    console.log("Message sent: %s", info.messageId);
+    
+  
+    
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    
+  }
+  
+
+  
+
 
 
 
